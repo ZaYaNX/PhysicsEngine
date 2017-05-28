@@ -57,7 +57,6 @@ bool AABB::IsOverlapping(AABB* aabb)
 
 	{
 		return true;
-
 	}
 
 }

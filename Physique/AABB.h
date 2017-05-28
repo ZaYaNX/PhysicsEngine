@@ -14,16 +14,12 @@ struct AABB
 
 
 	void SetCenter(Vector2 c);
-
 	void SetSize(Vector2 s);
-
-	void update(sf::RenderWindow* w);
-
-	sf::RectangleShape rectangle;
-
-	bool IsOverlapping(AABB*);
-
 	void setCenter(Vector2 position);
+	void update(sf::RenderWindow* w);
+	sf::RectangleShape rectangle;
+	bool IsOverlapping(AABB*);
+	
 
 	~AABB();
 

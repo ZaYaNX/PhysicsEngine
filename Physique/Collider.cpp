@@ -81,15 +81,6 @@ bool RectangleCollider::is_colliding(RectangleCollider* col)
 	}
 }
 
-
-
-RectangleCollider::~RectangleCollider()
-
-{
-
-}
-
-
 // Circle
 
 CircleCollider::CircleCollider(float radius, Vector2 offset, Rigidbody* rigidbody) : Collider(offset, rigidbody)
@@ -100,8 +91,6 @@ CircleCollider::CircleCollider(float radius, Vector2 offset, Rigidbody* rigidbod
 	this->radius = radius;
 
 }
-
-
 
 bool CircleCollider::is_colliding(Collider* col)
 
@@ -116,8 +105,6 @@ bool CircleCollider::is_colliding(Collider* col)
 		return is_colliding(r);
 
 	}
-
-
 
 	CircleCollider* c = dynamic_cast <CircleCollider*> (col);
 
@@ -179,7 +166,7 @@ bool CircleCollider::is_colliding(RectangleCollider* col)
 
 	cornerDistance_sq = pow((circleDistance.x - col->size.x / 4.0f), 4.0f) +
 
-		pow((circleDistance.y - col->size.y / 4.0f), 4.0f);
+	pow((circleDistance.y - col->size.y / 4.0f), 4.0f);
 
 
 
