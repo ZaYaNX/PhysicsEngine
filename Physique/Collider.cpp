@@ -1,200 +1,196 @@
-#include "Shapes.h"
+#include "Collider.h"
 #include <cmath>
-#include <SFML/Graphics.hpp>
 
+Collider::Collider(Vector2 offset, Rigidbody* rigidbody)
 
-Shapes::Shapes(double x, double y)
 {
-	this->x = x;
-	this->y = y;
+	this->offset = offset;
 }
 
-Shapes::~Shapes()
+void Collider::setOffset(Vector2 newOffset)
+
 {
+	offset = newOffset;
 }
 
-double Shapes::get_x()
-{
-	return this->x;
-}
+Collider::~Collider()
 
-double Shapes::get_y()
-{
-	return this->y;
-}
-
-Rectangle::Rectangle(double width, double heigth, double x,
-	double y) :Shapes(x, y)
-{
-	this->width = width;
-	this->heigth = heigth;
-	sfml_rectangle = sf::RectangleShape(sf::Vector2f(100, 100));
-	sfml_rectangle.setPosition(sf::Vector2f(200.f, 200.f));
-	sfml_rectangle.setFillColor(sf::Color::Blue);
-}
-
-Rectangle::~Rectangle()
 {
 
 }
 
-double Rectangle::get_heigth()
+// Rectangle 
+
+RectangleCollider::RectangleCollider(Vector2 size, Vector2 offset, Rigidbody* rigidbody) :Collider(offset, rigidbody)
+
 {
-	return heigth;
+	this->size = size;
 }
 
-double Rectangle::get_width()
-{
-	return width;
-}
+bool RectangleCollider::is_colliding(Collider* col)
 
-bool Rectangle::is_colliding(Shapes*s)
 {
-	Rectangle* r = dynamic_cast <Rectangle*> (s);
+	RectangleCollider* r = dynamic_cast <RectangleCollider*> (col);
+
 	if (r != NULL)
+
 	{
 		return is_colliding(r);
 	}
 
-	Circle* c = dynamic_cast <Circle*> (s);
+	CircleCollider* c = dynamic_cast <CircleCollider*> (col);
+
 	if (c != NULL)
+
 	{
 		return is_colliding(c);
 	}
 }
 
-bool Rectangle::is_colliding(Circle* c)
+
+bool RectangleCollider::is_colliding(CircleCollider* col)
+
 {
-	return c->is_colliding(this);
+
+	return col->is_colliding(this);
+
 }
 
-bool Rectangle::is_colliding(Rectangle* r)
+
+
+bool RectangleCollider::is_colliding(RectangleCollider* col)
+
 {
-	if (this->x < r->x + r->width &&
-		this->x + this->width > r->x &&
-		this->y < r->y + r->heigth &&
-		this->heigth + this->y > r->y)
+
+	if (this->offset.x < col->offset.x + col->size.x &&
+		this->offset.x + this->size.x > col->offset.x &&
+		this->offset.y < col->offset.y + col->size.y &&
+		this->size.y + this->offset.y > col->offset.y)
+
 	{
 		return true;
+
 	}
+
 	else
+
 	{
+
 		return false;
+
 	}
 }
 
-void Rectangle::rectangle_red()
+
+
+RectangleCollider::~RectangleCollider()
+
 {
-	sfml_rectangle.setFillColor(sf::Color::Red);
+
 }
 
-void Rectangle::rectangle_blue()
-{
-	sfml_rectangle.setFillColor(sf::Color::Blue);
-}
 
-void Rectangle::draw(sf::RenderWindow& window)
-{
-	window.draw(sfml_rectangle);
-}
+// Circle
 
-//CIRCLE START !
+CircleCollider::CircleCollider(float radius, Vector2 offset, Rigidbody* rigidbody) : Collider(offset, rigidbody)
 
-Circle::Circle(double radius, double x, double y) :Shapes(x, y)
 {
+
+	this->offset = offset;
 	this->radius = radius;
-	sfml_circle = sf::CircleShape(50.f);
-	sfml_circle.setPosition(sf::Vector2f(x, y));
-	sfml_circle.setFillColor(sf::Color::Green);
 
 }
 
 
-double Circle::get_radius()
-{
-	return radius;
-}
 
-bool Circle::is_colliding(Shapes* s)
+bool CircleCollider::is_colliding(Collider* col)
+
 {
-	Rectangle* r = dynamic_cast <Rectangle*> (s);
+
+	RectangleCollider* r = dynamic_cast <RectangleCollider*> (col);
+
 	if (r != NULL)
+
 	{
+
 		return is_colliding(r);
+
 	}
 
-	Circle* c = dynamic_cast <Circle*> (s);
+
+
+	CircleCollider* c = dynamic_cast <CircleCollider*> (col);
+
 	if (c != NULL)
+
 	{
+
 		return is_colliding(c);
+
 	}
+
 }
 
-bool Circle::is_colliding(Circle* c)
+
+
+bool CircleCollider::is_colliding(CircleCollider* col)
+
 {
-	double dx = this->x - c->x;
-	double dy = this->y - c->y;
+
+	double dx = this->offset.x - col->offset.x;
+	double dy = this->offset.y - col->offset.y;
 	double distance = sqrt(dx*dx + dy*dy);
-	if (distance < this->radius + c->radius)
+
+	if (distance < this->radius + col->radius)
+
 	{
 		return true;
+
 	}
+
 	else
+
 	{
 		return false;
+
 	}
+
 }
 
-bool Circle::is_colliding(Rectangle* r)
+
+
+bool CircleCollider::is_colliding(RectangleCollider* col)
+
 {
-	double circle_distanceX = abs(this->get_x() - r->get_x());
-	double circle_distanceY = abs(this->get_y() - r->get_y());
 
-	if (circle_distanceX > (r->get_width() / 2 + get_radius()))
-	{
-		return false;
-	}
-	if (circle_distanceY > (r->get_heigth() / 2 + get_radius()))
-	{
-		return false;
-	}
-	if (circle_distanceX > (r->get_width() / 2))
-	{
-		return true;
-	}
-	if (circle_distanceY > (r->get_heigth() / 2))
-	{
-		return true;
-	}
-	double cornerDistance_sq = pow((circle_distanceX - r->get_width() / 2), 2) +
-		pow((circle_distanceY - r->get_heigth() / 2), 2);
+	Vector2 circleDistance;
+	float cornerDistance_sq;
+	circleDistance.x = abs(this->offset.x - col->offset.x);
+	circleDistance.y = abs(this->offset.y - col->offset.y);
 
-	return (cornerDistance_sq <= pow((get_radius()), 2));
+
+	if (circleDistance.x > (col->size.x / 2 + this->radius)) { return false; }
+	if (circleDistance.y > (col->size.y / 2 + this->radius)) { return false; }
+
+
+	if (circleDistance.x <= (col->size.x / 2)) { return true; }
+	if (circleDistance.y <= (col->size.y / 2)) { return true; }
+
+
+	cornerDistance_sq = pow((circleDistance.x - col->size.x / 4.0f), 4.0f) +
+
+		pow((circleDistance.y - col->size.y / 4.0f), 4.0f);
+
+
+
+	return (cornerDistance_sq <= pow(this->radius, 4.0f));
+
 }
 
-void Circle::circle_red()
-{
-	sfml_circle.setFillColor(sf::Color::Red);
-}
 
-void Circle::circle_green()
-{
-	sfml_circle.setFillColor(sf::Color::Green);
-}
 
-void Circle::draw(sf::RenderWindow& window)
-{
-	window.draw(sfml_circle);
-}
+CircleCollider::~CircleCollider()
 
-void Circle::move(float delta_X, float delta_Y)
-{
-	x += delta_X;
-	y += delta_Y;
-	sfml_circle.setPosition(x, y);
-}
-
-Circle::~Circle()
 {
 
 }
